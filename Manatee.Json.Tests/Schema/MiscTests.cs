@@ -27,12 +27,12 @@ namespace Manatee.Json.Tests.Schema
 		{
 			get
 			{
-				yield return new TestCaseData(new JsonObject {["power"] = 10000, ["disbelief"] = true}, true);
-				yield return new TestCaseData(new JsonObject(), true);
-				yield return new TestCaseData(new JsonObject {["power"] = 1000, ["confidence"] = true}, true);
-				yield return new TestCaseData(new JsonObject {["power"] = 10000}, false);
-				yield return new TestCaseData(new JsonObject {["power"] = 10000, ["confidence"] = true}, false);
-				yield return new TestCaseData(new JsonObject {["power"] = 1000}, false);
+				yield return new TestCaseData(new JsonObject { ["power"] = 10000, ["disbelief"] = true }, true);
+				yield return new TestCaseData(new JsonObject(), false);
+				yield return new TestCaseData(new JsonObject { ["power"] = 1000, ["confidence"] = true }, true);
+				yield return new TestCaseData(new JsonObject { ["power"] = 10000 }, false);
+				yield return new TestCaseData(new JsonObject { ["power"] = 10000, ["confidence"] = true }, false);
+				yield return new TestCaseData(new JsonObject { ["power"] = 1000 }, false);
 			}
 		}
 
