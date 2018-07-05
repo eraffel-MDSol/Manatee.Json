@@ -31,9 +31,11 @@ if not "%errorlevel%"=="0" goto failure
 REM package
 call "%msbuild%" Manatee.Json\Manatee.Json.csproj /t:pack /p:Configuration="%config%"
 if not "%errorlevel%"=="0" goto failure		
-		
+call "%msbuild%" Manatee.Json.Logic\Manatee.Json.Logic.csproj /t:pack /p:Configuration="%config%"
+if not "%errorlevel%"=="0" goto failure		
+        
 :success		
 exit 0		
- 		  
+          
 :failure
 exit -1 

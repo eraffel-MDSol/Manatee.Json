@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net45;netstandard1.3;netstandard2.0</TargetFrameworks>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)'=='net45'">
+		<TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
+		<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+		<DefineConstants>NET45</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)'!='net45'">
+		<TargetFrameworkIdentifier>.NETStandard</TargetFrameworkIdentifier>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Manatee.Json.xml</DocumentationFile>
+		<Authors>gregsdennis</Authors>
+		<Company>Little Crab Solutions</Company>
+		<Product>Manatee.Json.Logic</Product>
+		<Description>Implements JsonLogic using Manatee.Json as the back-end.</Description>
+		<Copyright>Copyright © 2018 Little Crab Solutions</Copyright>
+		<PackageLicenseUrl>https://github.com/gregsdennis/Manatee.Json/blob/master/LICENSE.txt</PackageLicenseUrl>
+		<PackageProjectUrl>https://gregsdennis.github.io/Manatee.Json/</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/gregsdennis/Manatee.Json</RepositoryUrl>
+		<PackageTags>json manatee logic jsonlogic</PackageTags>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Manatee.Json\Manatee.Json.csproj" />
+	</ItemGroup>
+
+</Project>
