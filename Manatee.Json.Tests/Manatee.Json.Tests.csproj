@@ -106,6 +106,7 @@
     <Compile Include="Pointer\SpecificationTests.cs" />
     <Compile Include="Schema\ClientTests.cs" />
     <Compile Include="Schema\ConstSchemaTests.cs" />
+    <Compile Include="Schema\GenerationTest.cs" />
     <Compile Include="Schema\JsonSchemaTypeTest.cs" />
     <Compile Include="Schema\SchemaValidationResultsExtensions.cs" />
     <Compile Include="Schema\SelfValidationTest.cs" />
@@ -173,6 +174,7 @@
     <Compile Include="Test References\Issue126.cs" />
     <Compile Include="Test References\Mass.cs" />
     <Compile Include="Test References\ObjectWithTwoUriProps.cs" />
+    <Compile Include="Test References\SchemaGenerationTarget.cs" />
     <Compile Include="Transform\ClientTest.cs" />
     <Compile Include="Path\GoessnerExamplesTest.cs" />
     <Compile Include="Schema\AllOfSchemaTest.cs" />

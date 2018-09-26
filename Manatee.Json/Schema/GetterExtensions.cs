@@ -318,6 +318,13 @@ namespace Manatee.Json.Schema
 			return schema.Get<TitleKeyword>()?.Value;
 		}
 		/// <summary>
+		/// Gets the value for the <code>title</code> keyword, if present.
+		/// </summary>
+		public static JsonSchemaType? Type(this JsonSchema schema)
+		{
+			return schema.Get<TypeKeyword>()?.Value;
+		}
+		/// <summary>
 		/// Gets the value for the <code>uniqueItems</code> keyword, if present.
 		/// </summary>
 		public static bool UniqueItems(this JsonSchema schema)

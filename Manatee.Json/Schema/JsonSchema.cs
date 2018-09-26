@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Manatee.Json.Internal;
 using Manatee.Json.Pointer;
+using Manatee.Json.Schema.Generation;
 using Manatee.Json.Serialization;
 
 namespace Manatee.Json.Schema
@@ -166,7 +167,7 @@ namespace Manatee.Json.Schema
 			return results;
 		}
 		/// <summary>
-		/// Used register any subschemas during validation.  Enables look-forward compatibility with <code>$ref</code> keywords.
+		/// Used to register any subschemas during validation.  Enables look-forward compatibility with <code>$ref</code> keywords.
 		/// </summary>
 		/// <param name="baseUri">The current base URI</param>
 		public void RegisterSubschemas(Uri baseUri)
@@ -219,6 +220,16 @@ namespace Manatee.Json.Schema
 			return foundSchema;
 
 		}
+
+		public static JsonSchema GenerateFor<T>(JsonSerializer serializer)
+		{
+			// TODO: I don't like having a new instance created each time here.
+			var schema = new SchemaGenerator().Generate<T>(serializer);
+			return Equals(schema, Empty)
+				? True
+				: schema;
+		}
+
 
 		internal SchemaValidationResults Validate(SchemaValidationContext context)
 		{

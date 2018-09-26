@@ -54,16 +54,26 @@ namespace Manatee.Json.Internal
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsNumericType(this Type value)
 		{
-			return value == typeof(decimal) ||
-			       value == typeof(double) ||
-			       value == typeof(float) ||
-			       value == typeof(int) ||
-			       value == typeof(uint) ||
-			       value == typeof(short) ||
-			       value == typeof(ushort) ||
-			       value == typeof(byte) ||
-			       value == typeof(long) ||
-			       value == typeof(ulong);
+			return IsFloat(value) || IsInteger(value);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsFloat(this Type type)
+		{
+			return type == typeof(decimal) ||
+			       type == typeof(double) ||
+			       type == typeof(float);
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsInteger(this Type type)
+		{
+			return type == typeof(int) ||
+			       type == typeof(uint) ||
+			       type == typeof(short) ||
+			       type == typeof(ushort) ||
+			       type == typeof(byte) ||
+			       type == typeof(long) ||
+			       type == typeof(ulong);
 		}
 
 		public static object Default(this Type type)
