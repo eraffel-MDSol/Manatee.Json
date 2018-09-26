@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 
 namespace Manatee.Json.Schema
@@ -32,7 +31,7 @@ namespace Manatee.Json.Schema
 		/// </summary>
 		public static JsonSchema AllOf(this JsonSchema schema, params JsonSchema[] definitions)
 		{
-			var keyword = schema.OfType<AllOfKeyword>().FirstOrDefault();
+			var keyword = schema.Get<AllOfKeyword>();
 
 			if (keyword == null)
 			{
@@ -49,7 +48,7 @@ namespace Manatee.Json.Schema
 		/// </summary>
 		public static JsonSchema AnyOf(this JsonSchema schema, params JsonSchema[] definitions)
 		{
-			var keyword = schema.OfType<AnyOfKeyword>().FirstOrDefault();
+			var keyword = schema.Get<AnyOfKeyword>();
 
 			if (keyword == null)
 			{
@@ -120,7 +119,7 @@ namespace Manatee.Json.Schema
 		/// </summary>
 		public static JsonSchema Definition(this JsonSchema schema, string name, JsonSchema definition)
 		{
-			var keyword = schema.OfType<DefinitionsKeyword>().FirstOrDefault();
+			var keyword = schema.Get<DefinitionsKeyword>();
 
 			if (keyword == null)
 			{
@@ -137,7 +136,7 @@ namespace Manatee.Json.Schema
 		/// </summary>
 		public static JsonSchema Dependency(this JsonSchema schema, string name, params string[] dependencies)
 		{
-			var keyword = schema.OfType<DependenciesKeyword>().FirstOrDefault();
+			var keyword = schema.Get<DependenciesKeyword>();
 
 			if (keyword == null)
 			{
@@ -154,7 +153,7 @@ namespace Manatee.Json.Schema
 		/// </summary>
 		public static JsonSchema Dependency(this JsonSchema schema, string name, JsonSchema dependency)
 		{
-			var keyword = schema.OfType<DependenciesKeyword>().FirstOrDefault();
+			var keyword = schema.Get<DependenciesKeyword>();
 
 			if (keyword == null)
 			{
@@ -279,7 +278,7 @@ namespace Manatee.Json.Schema
 		/// </summary>
 		public static JsonSchema Items(this JsonSchema schema, params JsonSchema[] definitions)
 		{
-			var keyword = schema.OfType<ItemsKeyword>().FirstOrDefault();
+			var keyword = schema.Get<ItemsKeyword>();
 
 			if (keyword == null)
 			{
@@ -386,7 +385,7 @@ namespace Manatee.Json.Schema
 		/// </summary>
 		public static JsonSchema OneOf(this JsonSchema schema, params JsonSchema[] definitions)
 		{
-			var keyword = schema.OfType<OneOfKeyword>().FirstOrDefault();
+			var keyword = schema.Get<OneOfKeyword>();
 
 			if (keyword == null)
 			{
@@ -421,7 +420,7 @@ namespace Manatee.Json.Schema
 		/// </summary>
 		public static JsonSchema PatternProperty(this JsonSchema schema, [RegexPattern] string name, JsonSchema property)
 		{
-			var keyword = schema.OfType<PatternPropertiesKeyword>().FirstOrDefault();
+			var keyword = schema.Get<PatternPropertiesKeyword>();
 
 			if (keyword == null)
 			{
@@ -438,7 +437,7 @@ namespace Manatee.Json.Schema
 		/// </summary>
 		public static JsonSchema Property(this JsonSchema schema, string name, JsonSchema property)
 		{
-			var keyword = schema.OfType<PropertiesKeyword>().FirstOrDefault();
+			var keyword = schema.Get<PropertiesKeyword>();
 
 			if (keyword == null)
 			{
@@ -491,7 +490,11 @@ namespace Manatee.Json.Schema
 		/// </summary>
 		public static JsonSchema Required(this JsonSchema schema, params string[] values)
 		{
-			schema.Add(new RequiredKeyword(values));
+			var required = schema.Get<RequiredKeyword>();
+			if (required == null)
+				schema.Add(new RequiredKeyword(values));
+			else
+				required.AddRange(values);
 
 			return schema;
 		}
