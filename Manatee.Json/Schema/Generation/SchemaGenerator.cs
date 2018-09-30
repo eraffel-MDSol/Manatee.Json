@@ -81,7 +81,82 @@ namespace Manatee.Json.Schema.Generation
 		//		subschemas.AddRange(schema.Definitions.Values);
 
 		//}
-		
+
+		public JsonSchema Generate2(Type type)
+		{
+			var properties = ReflectionCache.GetMembers(type, PropertySelectionStrategy.ReadWriteOnly, false)
+				.Select(m => m.MemberInfo)
+				.OfType<PropertyInfo>()
+				.ToList();
+
+			var allPropertyTypes = new List<Type>();
+			_GetComplexPropertyTypes(type, allPropertyTypes);
+
+			allPropertyTypes.Remove(type);
+
+			// generate schemas for all property types
+			// if I add them in reverse, it *should* be in an inverted dependency sequence
+			var definitions = allPropertyTypes.Select()
+
+			// create empty schema
+			var schema = new JsonSchema();
+
+			// get schema type
+			_AssignType(schema, type, serializer);
+
+			// add properties
+			if (_generateProperties)
+			{
+				foreach (var propertyInfo in properties)
+				{
+					var propertySchema = new SchemaGenerator().Generate(propertyInfo.PropertyType, serializer);
+					var attributes = propertyInfo.GetCustomAttributes()
+						.OfType<ISchemaGenerationAttribute>()
+						.ToList();
+					JsonSchema schemaToUpdate;
+					switch (propertySchema.Type())
+					{
+						case JsonSchemaType.Array:
+							schemaToUpdate = propertySchema.Items()[0];
+							break;
+						case JsonSchemaType.Object:
+							schemaToUpdate = propertySchema.AdditionalProperties();
+							break;
+						default:
+							schemaToUpdate = propertySchema;
+							break;
+					}
+					foreach (var attribute in attributes)
+					{
+						attribute.Update(schemaToUpdate);
+					}
+					var propertyName = serializer.Options.SerializationNameTransform(propertyInfo.Name);
+					schema.Property(propertyName, propertySchema);
+					if (propertyInfo.GetCustomAttribute<RequiredAttribute>() != null)
+						schema.Required(propertyName);
+				}
+			}
+
+			return Equals(schema, JsonSchema.Empty)
+				? JsonSchema.True
+				: schema;
+		}
+
+		private void _GetComplexPropertyTypes(Type type, List<Type> foundTypes)
+		{
+			var propertyTypes = ReflectionCache.GetMembers(type, PropertySelectionStrategy.ReadWriteOnly, false)
+				.Select(m => ((PropertyInfo) m.MemberInfo).PropertyType)
+				.Except(foundTypes)
+				.ToList();
+
+			foundTypes.AddRange(propertyTypes);
+
+			foreach (var propertyType in propertyTypes)
+			{
+				_GetComplexPropertyTypes(propertyType, foundTypes);
+			}
+		}
+
 		private void _AssignType(JsonSchema schema, Type type, JsonSerializer serializer)
 		{
 			var typeInfo = type.GetTypeInfo();
@@ -121,5 +196,11 @@ namespace Manatee.Json.Schema.Generation
 				_rawSchemas[type] = schema;
 			}
 		}
+	}
+
+	public interface ISchemaProvider
+	{
+		Type Type { get; }
+		JsonSchema Schema { get; }
 	}
 }

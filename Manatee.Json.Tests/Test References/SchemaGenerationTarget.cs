@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Manatee.Json.Schema;
 using Manatee.Json.Schema.Generation;
 
 namespace Manatee.Json.Tests.Test_References
@@ -33,11 +35,34 @@ namespace Manatee.Json.Tests.Test_References
 		public string Website { get; set; }
 		public SchemaGenerationTarget Recurse { get; set; }
 		public SchemaGenerationSimpleTarget Simple { get; set; }
+		public TimeSpan UriProp { get; set; }
+		public CustomTypeAsString BasicCustom { get; set; }
+		[MinLength(10)]
+		public CustomTypeAsString ComplexCustom { get; set; }
+	}
+
+	public class CustomTypeAsString
+	{
+		public string Value { get; }
+
+		public CustomTypeAsString(string value)
+		{
+			Value = value;
+		}
 	}
 
 	public class SchemaGenerationSimpleTarget
 	{
 		public int Integer { get; set; }
 		public string String { get; set; }
+	}
+
+	public class CustomTypeAsStringSchemaProvider : ISchemaProvider
+	{
+		public Type Type => typeof(CustomTypeAsString);
+
+		public JsonSchema Schema { get; } = new JsonSchema()
+			.Type(JsonSchemaType.String)
+			.Pattern("^[a-z]+$");
 	}
 }

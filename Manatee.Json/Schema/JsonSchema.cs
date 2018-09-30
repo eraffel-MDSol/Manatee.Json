@@ -223,8 +223,7 @@ namespace Manatee.Json.Schema
 
 		public static JsonSchema GenerateFor<T>(JsonSerializer serializer)
 		{
-			// TODO: I don't like having a new instance created each time here.
-			var schema = new SchemaGenerator().Generate<T>(serializer);
+			var schema = new SchemaGenerator().Generate2(typeof(T));
 			return Equals(schema, Empty)
 				? True
 				: schema;
