@@ -201,8 +201,8 @@ namespace Manatee.Json
 		/// </summary>
 		public JsonValue(JsonValue other)
 		{
-			_arrayValue = other._arrayValue;
-			_objectValue = other._objectValue;
+			_arrayValue = new JsonArray(other._arrayValue);
+			_objectValue = new JsonObject(other._objectValue);
 			_numberValue = other._numberValue;
 			_stringValue = other._stringValue;
 			_boolValue = other._boolValue;

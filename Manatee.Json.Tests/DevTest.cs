@@ -18,13 +18,25 @@ namespace Manatee.Json.Tests
 {
 	[TestFixture]
 	// TODO: Add categories to exclude this test.
-	[Ignore("This test fixture for development purposes only.")]
+	//[Ignore("This test fixture for development purposes only.")]
 	public class DevTest
 	{
 		[Test]
 		public void Test()
 		{
-			Console.WriteLine(JsonPatch.Schema.ToJson(new JsonSerializer()).GetIndentedString());
+			JsonValue instance = new JsonObject {["test"] = 9};
+			var numberSchema = new JsonSchema()
+				.Type(JsonSchemaType.Object)
+				.Property("test", new JsonSchema().Type(JsonSchemaType.Number));
+			var stringSchema = new JsonSchema()
+				.Type(JsonSchemaType.Object)
+				.Property("test", new JsonSchema().Type(JsonSchemaType.String));
+
+			var numberResult = numberSchema.Filter(instance);
+			var stringResult = stringSchema.Filter(instance);
+
+			Assert.AreEqual(instance, numberResult);
+			Assert.AreEqual((JsonValue) new JsonObject(), numberResult);
 		}
 	}
 }

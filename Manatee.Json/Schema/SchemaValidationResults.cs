@@ -49,6 +49,7 @@ namespace Manatee.Json.Schema
 		/// Gets or sets any results of nested schemas.
 		/// </summary>
 		public List<SchemaValidationResults> NestedResults { get; set; } = new List<SchemaValidationResults>();
+		public JsonValue FilterResult { get; set; }
 
 		internal SchemaValidationResults() { }
 		internal SchemaValidationResults(SchemaValidationContext context)

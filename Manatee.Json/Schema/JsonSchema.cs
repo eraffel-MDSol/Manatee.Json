@@ -220,6 +220,20 @@ namespace Manatee.Json.Schema
 
 		}
 
+		public JsonValue Filter(JsonValue json)
+		{
+			var results = Validate(new SchemaValidationContext
+				{
+					Instance = json,
+					Root = this,
+					BaseRelativeLocation = new JsonPointer("#"),
+					RelativeLocation = new JsonPointer("#"),
+					InstanceLocation = new JsonPointer("#")
+				});
+
+			return results.FilterResult;
+		}
+
 		internal SchemaValidationResults Validate(SchemaValidationContext context)
 		{
 			if (_inherentValue.HasValue)
