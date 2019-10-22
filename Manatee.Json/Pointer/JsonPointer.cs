@@ -34,10 +34,21 @@ namespace Manatee.Json.Pointer
 		/// </summary>
 		/// <param name="source">A collection of strings representing the segments of the pointer.</param>
 		public JsonPointer(IEnumerable<string> source)
-			: base(source.SkipWhile(s => s == "#"))
+			: base(source.FirstOrDefault() == "#" ? source.SkipWhile(s => s == "#") : source)
 		{
 			_usesHash = source.FirstOrDefault() == "#";
+		}
 
+		/// <summary>
+		/// Creates a new <see cref="JsonPointer"/> instance.
+		/// </summary>
+		/// <param name="source">A collection of strings representing the segments of the pointer.</param>
+		/// /// <param name="capacity">An integer indicating the initial capacity for the underlying List.</param>
+		private JsonPointer(JsonPointer source, int capacity)
+			: base(capacity)
+		{
+			AddRange(source.FirstOrDefault() == "#" ? source.SkipWhile(s => s == "#") : source);
+			_usesHash = source.FirstOrDefault() == "#";
 		}
 
 		/// <summary>
@@ -111,7 +122,7 @@ namespace Manatee.Json.Pointer
 		/// <param name="append">The segments to append.</param>
 		public JsonPointer CloneAndAppend(params string[] append)
 		{
-			var clone = new JsonPointer(this){_usesHash = _usesHash};
+			var clone = new JsonPointer(this, Count + append.Length) {_usesHash = _usesHash};
 			clone.AddRange(append);
 
 			return clone;
