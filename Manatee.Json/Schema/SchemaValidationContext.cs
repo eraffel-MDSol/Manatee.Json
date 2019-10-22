@@ -82,15 +82,14 @@ namespace Manatee.Json.Schema
 		/// Creates a new instance of the <see cref="SchemaValidationContext"/> class by copying values from another instance.
 		/// </summary>
 		public SchemaValidationContext(SchemaValidationContext source)
-			: this()
 		{
 			Local = source.Local;
 			Root = source.Root;
 			RecursiveAnchor = source.RecursiveAnchor;
 			Instance = source.Instance;
-			EvaluatedPropertyNames.UnionWith(source.EvaluatedPropertyNames);
-			LocallyEvaluatedPropertyNames.UnionWith(source.LocallyEvaluatedPropertyNames);
-			LastEvaluatedIndex = source.LastEvaluatedIndex;
+			_evaluatedPropertyNames = new HashSet<string>(source.EvaluatedPropertyNames);
+			_locallyEvaluatedPropertyNames = new HashSet<string>(source.LocallyEvaluatedPropertyNames);
+            LastEvaluatedIndex = source.LastEvaluatedIndex;
 			LocalTierLastEvaluatedIndex = source.LocalTierLastEvaluatedIndex;
 			BaseUri = source.BaseUri;
 			InstanceLocation = source.InstanceLocation;
