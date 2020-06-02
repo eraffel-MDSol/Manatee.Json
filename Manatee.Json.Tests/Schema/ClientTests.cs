@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Manatee.Json.Pointer;
 using Manatee.Json.Schema;
 using Manatee.Json.Serialization;
@@ -366,7 +367,6 @@ namespace Manatee.Json.Tests.Schema
 		[Test]
 		public void Issue194_refNoIntuitiveErrorMessage()
 		{
-			JsonSchemaOptions.OutputFormat = SchemaValidationOutputFormat.Detailed;
 			var actual = new JsonSchema()
 				.Ref("#/definitions/apredefinedtype")
 				.Definition("apredefinedtype", new JsonSchema()
@@ -392,7 +392,7 @@ namespace Manatee.Json.Tests.Schema
 						}
 				};
 
-			var messages = actual.Validate(jObject);
+			var messages = actual.Validate(jObject, new JsonSchemaOptions {OutputFormat = SchemaValidationOutputFormat.Detailed});
 
 			messages.AssertInvalid(expected);
 		}
@@ -495,18 +495,9 @@ namespace Manatee.Json.Tests.Schema
 
 			var instance = new JsonObject {["t_PulseTimePeriod"] = new JsonObject {["values"] = new JsonArray()}};
 
-			var format = JsonSchemaOptions.OutputFormat;
-			try
-			{
-				JsonSchemaOptions.OutputFormat = SchemaValidationOutputFormat.Detailed;
-				var result = schema.Validate(instance);
+			var result = schema.Validate(instance, new JsonSchemaOptions { OutputFormat = SchemaValidationOutputFormat.Detailed });
 
-				result.AssertInvalid();
-			}
-			finally
-			{
-				JsonSchemaOptions.OutputFormat = format;
-			}
+			result.AssertInvalid();
 		}
 
 		[Test]
@@ -543,18 +534,9 @@ namespace Manatee.Json.Tests.Schema
 
 			var instance = new JsonObject { ["t_PulseTimePeriod"] = new JsonObject { ["values"] = new JsonArray() } };
 
-			var format = JsonSchemaOptions.OutputFormat;
-			try
-			{
-				JsonSchemaOptions.OutputFormat = SchemaValidationOutputFormat.Detailed;
-				var result = resistanceSchema.Validate(instance);
+			var result = resistanceSchema.Validate(instance, new JsonSchemaOptions { OutputFormat = SchemaValidationOutputFormat.Detailed });
 
-				result.AssertInvalid();
-			}
-			finally
-			{
-				JsonSchemaOptions.OutputFormat = format;
-			}
+			result.AssertInvalid();
 		}
 
 		[Test]
@@ -582,6 +564,79 @@ namespace Manatee.Json.Tests.Schema
 			var results = schema.Validate(instance);
 
 			results.AssertValid();
+		}
+
+		[TestCase("draft7", 1)]
+		[TestCase("draft2019-09", 2)]
+		public void Issue269_DownloadOverrideNotWorking(string draft, int expectedDownloadCount)
+		{
+			try
+			{
+				var schemaDirPath = $"{AppDomain.CurrentDomain.BaseDirectory}/Files/Issue269/{draft}/";
+				var schemaUriPrefix = "http://localhost/";
+				var jsonData = JsonValue.Parse("{\"propertyAffectedFromSubSchema\": {}}");
+				var serializer = new JsonSerializer();
+				var downloadCount = 0;
+
+				JsonSchemaOptions.Download = uri =>
+					{
+						downloadCount++;
+						Console.WriteLine($"Downloading {uri}");
+						var localSchemaPath = uri.Replace(schemaUriPrefix, schemaDirPath); //Set Breakpoint
+						var filePath = $"{localSchemaPath}.schema.json";
+						return File.ReadAllText(filePath);
+					};
+
+				JsonSchemaRegistry.Clear();
+				var instanceSchemaFilePath = $"{System.IO.Path.Combine(schemaDirPath, "schemas/1.1.0/instance")}.schema.json";
+				var schemaJson = JsonValue.Parse(File.ReadAllText(instanceSchemaFilePath));
+				var schema = serializer.Deserialize<JsonSchema>(schemaJson);
+				var validationResults = schema.Validate(jsonData);
+
+				Assert.AreEqual(expectedDownloadCount, downloadCount);
+			}
+			finally
+			{
+				JsonSchemaOptions.Download = null!;
+			}
+		}
+
+		[Test]
+		public void Issue271_ConcurrentValidation()
+		{
+			var validateSchemaAction = new Action(() =>
+				{
+					var serializer = new JsonSerializer();
+					var schemaText = File.ReadAllText($"{AppDomain.CurrentDomain.BaseDirectory}/Files/Issue271.json");
+					var schemaJson = JsonValue.Parse(schemaText);
+					var schema = serializer.Deserialize<JsonSchema>(schemaJson);
+
+					schema.ValidateSchema();
+				});
+
+			var exceptions = new List<Exception>();
+
+			Parallel.ForEach(
+				new[]
+					{
+						validateSchemaAction,
+						validateSchemaAction,
+						validateSchemaAction,
+						validateSchemaAction,
+						validateSchemaAction
+					}, action =>
+					{
+						try
+						{
+							action();
+						}
+						catch (Exception ex)
+						{
+							exceptions.Add(ex);
+						}
+					});
+
+			Assert.IsEmpty(exceptions);
 		}
 	}
 }

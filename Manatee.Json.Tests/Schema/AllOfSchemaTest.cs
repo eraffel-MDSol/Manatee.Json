@@ -17,8 +17,6 @@ namespace Manatee.Json.Tests.Schema
 		[Test]
 		public void ValidateReturnsErrorOnAnyInvalid()
 		{
-			JsonSchemaOptions.OutputFormat = SchemaValidationOutputFormat.Verbose;
-
 			var schema = new JsonSchema()
 				.AllOf(new JsonSchema().Type(JsonSchemaType.Array),
 				       new JsonSchema().Type(JsonSchemaType.Number));
@@ -95,7 +93,7 @@ namespace Manatee.Json.Tests.Schema
 						}
 				};
 
-			var results = schema.Validate(json);
+			var results = schema.Validate(json, new JsonSchemaOptions{OutputFormat = SchemaValidationOutputFormat.Verbose});
 
 			results.AssertInvalid(expected);
 		}
@@ -103,8 +101,6 @@ namespace Manatee.Json.Tests.Schema
 		[Test]
 		public void ValidateReturnsValidOnAllValid()
 		{
-			JsonSchemaOptions.OutputFormat = SchemaValidationOutputFormat.Verbose;
-
 			var schema = new JsonSchema()
 				.AllOf(new JsonSchema()
 					       .Type(JsonSchemaType.Number)
@@ -181,9 +177,22 @@ namespace Manatee.Json.Tests.Schema
 						}
 				};
 
-			var results = schema.Validate(json);
+			var results = schema.Validate(json, new JsonSchemaOptions {OutputFormat = SchemaValidationOutputFormat.Verbose});
 
 			results.AssertValid(expected);
+		}
+
+		[Test]
+		public void AllOfOrderingUnimportant()
+		{
+			var schema = new JsonSchema().Schema(MetaSchemas.Draft2019_09.Schema)
+				.AllOf(new JsonSchema().Property("foo", true),
+					new JsonSchema().UnevaluatedProperties(false));
+			JsonValue instance = new JsonObject{["foo"]  = 1};
+
+			var results = schema.Validate(instance);
+			
+			results.AssertInvalid();
 		}
 	}
 }
